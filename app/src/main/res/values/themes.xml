@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.TryandError" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/ignite_orange</item>
+        <item name="colorPrimaryDark">@color/ignite_orange_dark</item>
+        <item name="colorAccent">@color/ignite_orange</item>
+        <item name="android:windowBackground">@color/app_background</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_hint</item>
+        <item name="android:navigationBarColor">@color/bottom_nav_bg</item>
+    </style>
+
+    <style name="Theme.TryandError" parent="Base.Theme.TryandError" />
+
+    <style name="DetailExpandedTitle" parent="TextAppearance.AppCompat.Headline">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">28sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:shadowColor">#80000000</item>
+        <item name="android:shadowDx">2</item>
+        <item name="android:shadowDy">2</item>
+        <item name="android:shadowRadius">4</item>
+    </style>
+
+    <style name="DetailCollapsedTitle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Wikipedia & UI Styles -->
+    <style name="RoundedAppearance" parent="">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+</resources>

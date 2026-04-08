@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:background="@color/app_background">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/detailAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="320dp"
+        android:fitsSystemWindows="false"
+        android:background="#000000"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:contentScrim="@color/ignite_orange"
+            app:expandedTitleMarginBottom="42dp"
+            app:expandedTitleMarginStart="24dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:expandedTitleTextAppearance="@style/DetailExpandedTitle"
+            app:collapsedTitleTextAppearance="@style/DetailCollapsedTitle">
+
+            <!-- Parallax Hero Image -->
+            <ImageView
+                android:id="@+id/detailHeaderImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_gallery"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="0.7" />
+
+            <!-- Gradient overlay for text readability -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/gradient_overlay_dark" />
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/detailToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:navigationIconTint="@android:color/white"
+                app:titleTextColor="@android:color/white"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- 📏 Reading Progress (Floating) -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/readingProgressBar"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        app:indicatorColor="@color/ignite_orange"
+        app:trackColor="@android:color/transparent"
+        android:progress="0"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
+        android:translationZ="12dp" />
+
+    <!-- 📜 Layered Content Card -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/detailNestedScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="-28dp"
+        android:background="@drawable/detail_card_bg"
+        android:elevation="8dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="40dp">
+
+            <!-- Handle for visual cue -->
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:background="#33000000"
+                app:cornerRadius="2dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="20dp">
+
+                <TextView
+                    android:id="@+id/tvDetailSource"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="BBC News"
+                    android:textColor="@color/ignite_orange"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipFollowSource"
+                    style="@style/Widget.MaterialComponents.Chip.Action"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="+ Follow"
+                    android:textColor="@color/ignite_orange"
+                    app:chipBackgroundColor="@android:color/transparent"
+                    app:chipStrokeColor="@color/ignite_orange"
+                    app:chipStrokeWidth="1dp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
+
+                <WebView
+                    android:id="@+id/newsWebView"
+                    android:layout_width="match_parent"
+                    android:layout_height="600dp" />
+
+                <!-- 🔍 Live Zoom Indicator -->
+                <TextView
+                    android:id="@+id/tvZoomIndicator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@drawable/zoom_indicator_bg"
+                    android:padding="12dp"
+                    android:text="Text Size: 100%"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:elevation="10dp" />
+            </FrameLayout>
+
+            <!-- 🔬 Wikipedia Intelligence Prompt -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/fabWikipedia"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="24dp"
+                android:text="Research on Wikipedia"
+                android:textColor="@color/ignite_orange"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/reading_mode_icon"
+                app:iconGravity="textStart"
+                app:iconPadding="12dp"
+                app:iconTint="@color/ignite_orange"
+                app:rippleColor="#20FF5722"
+                app:strokeColor="@color/ignite_orange"
+                app:strokeWidth="1.5dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginVertical="24dp"
+                android:background="#1A000000" />
+
+            <TextView
+                android:id="@+id/relatedSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginBottom="12dp"
+                android:text="Dive Deeper"
+                android:textColor="@color/ignite_orange"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05"
+                android:visibility="gone" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerRelated"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:visibility="visible">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <View android:layout_width="160dp" android:layout_height="220dp" android:layout_marginEnd="12dp" android:background="#F5F5F5" />
+                    <View android:layout_width="160dp" android:layout_height="220dp" android:background="#F5F5F5" />
+                </LinearLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/relatedRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="24dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/detailProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        app:layout_anchor="@id/detailNestedScroll"
+        app:layout_anchorGravity="center" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

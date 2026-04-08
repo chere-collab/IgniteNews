@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_text_size"
+        android:title="Aa"
+        app:actionLayout="@layout/layout_menu_text_size"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_listen"
+        android:title="Listen"
+        android:icon="@android:drawable/ic_lock_silent_mode_off"
+        app:iconTint="@android:color/white"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_share"
+        android:title="Share"
+        android:icon="@android:drawable/ic_menu_share"
+        app:iconTint="@android:color/white"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_download"
+        android:title="Download as PDF"
+        android:icon="@android:drawable/stat_sys_download"
+        app:iconTint="@android:color/white"
+        app:showAsAction="ifRoom" />
+</menu>

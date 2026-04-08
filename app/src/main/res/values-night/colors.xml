@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Mode Color Overrides -->
+    <color name="app_background">#121212</color>
+    <color name="card_background">#1E1E2E</color>
+    <color name="text_primary">#EFEFEF</color>
+    <color name="text_secondary">#BBBBBB</color>
+    <color name="text_hint">#888888</color>
+    <color name="divider_color">#333355</color>
+    <color name="bottom_nav_bg">#1E1E2E</color>
+    <color name="category_unselected_bg">#2A2A3E</color>
+    <color name="category_unselected_text">#CCCCCC</color>
+    <color name="search_card_bg">#1E1E2E</color>
+</resources>
