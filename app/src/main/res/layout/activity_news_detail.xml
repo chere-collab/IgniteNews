@@ -147,24 +147,8 @@
                     android:elevation="10dp" />
             </FrameLayout>
 
-            <!-- 🔬 Wikipedia Intelligence Prompt -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/fabWikipedia"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:layout_marginHorizontal="24dp"
-                android:layout_marginTop="24dp"
-                android:text="Research on Wikipedia"
-                android:textColor="@color/ignite_orange"
-                app:cornerRadius="16dp"
-                app:icon="@drawable/reading_mode_icon"
-                app:iconGravity="textStart"
-                app:iconPadding="12dp"
-                app:iconTint="@color/ignite_orange"
-                app:rippleColor="#20FF5722"
-                app:strokeColor="@color/ignite_orange"
-                app:strokeWidth="1.5dp" />
+            <!-- Removed Wikipedia Intelligence Logic -->
+
 
             <View
                 android:layout_width="match_parent"

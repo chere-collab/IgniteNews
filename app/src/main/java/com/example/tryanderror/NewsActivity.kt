@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.appcompat.widget.SearchView
+import androidx.drawerlayout.widget.DrawerLayout
+import com.google.android.material.navigation.NavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
@@ -42,6 +44,8 @@ class NewsActivity : AppCompatActivity() {
     private lateinit var shimmerLayout: com.facebook.shimmer.ShimmerFrameLayout
     private lateinit var heroViewPager: ViewPager2
     private lateinit var carouselCard: CardView
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navView: NavigationView
 
     // Auto-scroll
     private val autoScrollHandler = android.os.Handler(android.os.Looper.getMainLooper())
@@ -99,6 +103,8 @@ class NewsActivity : AppCompatActivity() {
         heroViewPager = findViewById<ViewPager2>(R.id.heroViewPager)
         carouselCard = findViewById<CardView>(R.id.carouselCard)
 
+        setupNavigationDrawer()
+
         // Feature 80: Setup Predictive Search
         suggestionCard = findViewById(R.id.suggestionCard)
         val rvSuggestions = findViewById<RecyclerView>(R.id.rvSuggestions)
@@ -129,9 +135,8 @@ class NewsActivity : AppCompatActivity() {
         searchEditText?.setTextColor(primaryColor)
         searchEditText?.setHintTextColor(android.graphics.Color.GRAY)
 
-        // Make three dots Orange to match arrows
-        val orangeColor = androidx.core.content.ContextCompat.getColor(this, R.color.ignite_orange)
-        toolbar.overflowIcon?.setTint(orangeColor)
+        // Make three dots Orange (REMOVED: menu consolidated into drawer)
+        // toolbar.overflowIcon?.setTint(orangeColor)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -250,6 +255,7 @@ class NewsActivity : AppCompatActivity() {
             }
         })
 
+        val orangeColor = androidx.core.content.ContextCompat.getColor(this, R.color.ignite_orange)
         swipeRefreshLayout.setColorSchemeColors(orangeColor)
         swipeRefreshLayout.setOnRefreshListener {
             // Feature 8: Haptic Feedback on Refresh
@@ -295,6 +301,73 @@ class NewsActivity : AppCompatActivity() {
         }
         
         updateProfileIcon()
+    }
+
+    private fun setupNavigationDrawer() {
+        drawerLayout = findViewById(R.id.drawerLayout)
+        navView = findViewById(R.id.navView)
+        val btnMenu: android.widget.ImageButton = findViewById(R.id.btnMenu)
+
+        // 🍔 Open drawer on hamburger click
+        btnMenu.setOnClickListener {
+            if (!drawerLayout.isDrawerOpen(androidx.core.view.GravityCompat.START)) {
+                drawerLayout.openDrawer(androidx.core.view.GravityCompat.START)
+            }
+        }
+
+        // 🔗 Handle Header Info
+        val headerView = navView.getHeaderView(0)
+        val tvUserEmail = headerView.findViewById<TextView>(R.id.tvNavUserEmail)
+        val ivProfile = headerView.findViewById<ImageView>(R.id.ivNavProfile)
+        
+        val user = auth.currentUser
+        tvUserEmail.text = user?.email ?: "Guest User"
+        
+        // Show actual profile image if they have one!
+        val prefs = getSharedPreferences("UserProfilePrefs", android.content.Context.MODE_PRIVATE)
+        val base64String = prefs.getString("profile_${user?.uid}", null)
+        if (base64String != null) {
+            val bytes = android.util.Base64.decode(base64String, android.util.Base64.DEFAULT)
+            val bitmap = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+            ivProfile.setImageBitmap(bitmap)
+        } else if (user?.photoUrl != null) {
+            Glide.with(this).load(user.photoUrl).circleCrop().into(ivProfile)
+        }
+
+        // 🧭 Navigation Item Selection
+        navView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_home -> {
+                    searchView.setQuery("", false)
+                    searchView.clearFocus()
+                    fetchNews(currentCategory ?: "technology")
+                    recyclerView.smoothScrollToPosition(0)
+                }
+                R.id.nav_bookmarks -> {
+                    startActivity(Intent(this, BookmarksActivity::class.java))
+                }
+                R.id.nav_history -> {
+                    startActivity(Intent(this, HistoryActivity::class.java))
+                }
+                R.id.nav_settings -> {
+                    startActivity(Intent(this, SettingsActivity::class.java))
+                }
+                R.id.nav_share -> {
+                    val shareIntent = Intent(Intent.ACTION_SEND)
+                    shareIntent.type = "text/plain"
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, "Check out IgniteNews! The elite way to stay informed. 🔥\nhttps://play.google.com/store/apps/details?id=com.example.tryanderror")
+                    startActivity(Intent.createChooser(shareIntent, "Share with Colleagues"))
+                }
+                R.id.nav_about -> {
+                    startActivity(Intent(this, AboutActivity::class.java))
+                }
+                R.id.nav_privacy -> {
+                    startActivity(Intent(this, LegalActivity::class.java))
+                }
+            }
+            drawerLayout.closeDrawer(androidx.core.view.GravityCompat.START)
+            true
+        }
     }
 
     override fun onResume() {
@@ -455,22 +528,11 @@ class NewsActivity : AppCompatActivity() {
     private var lastFetchQuery: String? = null
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu_news, menu)
-        return true
+        // Menu items moved to side drawer
+        return false
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_settings -> {
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
-                return true
-            }
-            R.id.action_bookmarks -> {
-                startActivity(Intent(this, BookmarksActivity::class.java))
-                return true
-            }
-        }
         return super.onOptionsItemSelected(item)
     }
 
@@ -573,14 +635,27 @@ class NewsActivity : AppCompatActivity() {
             setLoading(false)
             if (response.isSuccessful && response.body() != null) {
                 lastFetchTime = System.currentTimeMillis()
-                val newArticles = response.body()!!.articles
+                var newArticles = response.body()!!.articles
                 
-                // Feature 77: Detailed Signal Trace
+                // Feature 66: Strict Source Filtering for 'Following' Feed
+                if (currentCategory == "following") {
+                    val userId = auth.currentUser?.uid ?: return
+                    val prefs = getSharedPreferences("PublisherPrefs_$userId", android.content.Context.MODE_PRIVATE)
+                    val followed = prefs.getStringSet("followed_sources", emptySet()) ?: emptySet()
+                    
+                    newArticles = newArticles.filter { article ->
+                        followed.contains(article.source?.name)
+                    }
+                }
+
                 if (newArticles.isEmpty()) {
-                    Toast.makeText(this@NewsActivity, "No results for [$contextLabel] in [$currentLanguage]", Toast.LENGTH_LONG).show()
+                    if (currentCategory == "following") {
+                        Toast.makeText(this@NewsActivity, "No recent stories from these specific sources.", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(this@NewsActivity, "No results for [$contextLabel] in [$currentLanguage]", Toast.LENGTH_LONG).show()
+                    }
                 } else {
                     saveToCache(newArticles)
-                    // Feature 71: Automatic Vault Sync
                     SmartCache.saveOfflineArticles(this@NewsActivity, newArticles)
                     
                     if (isHome) {

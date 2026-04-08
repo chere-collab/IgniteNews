@@ -59,6 +59,9 @@ class NewsDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 .into(headerImage)
         }
 
+        // 📜 Track Reading History (Secure Cloud-First)
+        addToHistory(url, title, source, imageUrl)
+
         // Feature 7: Reading Progress Logic
         val readingBar = findViewById<com.google.android.material.progressindicator.LinearProgressIndicator>(R.id.readingProgressBar)
         val nestedScroll = findViewById<androidx.core.widget.NestedScrollView>(R.id.detailNestedScroll) // Wait! I need to ensure ID is set.
@@ -119,20 +122,8 @@ class NewsDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             chipFollow.visibility = android.view.View.GONE
         }
 
-        // Wikipedia Intelligence Logic (Always Active)
-        findViewById<com.google.android.material.button.MaterialButton>(R.id.fabWikipedia).setOnClickListener {
-            // Strategic Extraction: Find the most important "Proper Nouns" (Capitalized words)
-            val words = title?.split(" ")?.filter { it.length > 2 } ?: emptyList()
-            val properNouns = words.filter { it[0].isUpperCase() }.take(2)
-            
-            val researchQuery = if (properNouns.isNotEmpty()) {
-                properNouns.joinToString(" ")
-            } else {
-                words.take(2).joinToString(" ")
-            }
-            
-            showWikipediaInsight(researchQuery)
-        }
+        // Wikipedia Intelligence Logic REMOVED
+
 
         if (url != null) {
             trackArticleView(url)
@@ -170,94 +161,8 @@ class NewsDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         }
     }
 
-    private fun showWikipediaInsight(query: String) {
-        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this, R.style.BottomSheetDialogTheme)
-        val view = layoutInflater.inflate(R.layout.dialog_wikipedia_card, null)
-        dialog.setContentView(view)
+    // Wikipedia Helper Methods REMOVED
 
-        val tvTitle = view.findViewById<TextView>(R.id.wikiTitle)
-        val tvExtract = view.findViewById<TextView>(R.id.wikiExtract)
-        val ivThumb = view.findViewById<ImageView>(R.id.wikiThumbnail)
-        val btnFull = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnFullWiki)
-        val btnClose = view.findViewById<android.widget.ImageButton>(R.id.btnCloseWiki)
-
-        tvTitle.text = "Searching..."
-        tvExtract.text = "Connecting to global servers..."
-
-        // Step 1: Find the official article title
-        WikipediaInstance.api.searchArticles(query).enqueue(object : retrofit2.Callback<List<Any>> {
-            override fun onResponse(call: retrofit2.Call<List<Any>>, response: retrofit2.Response<List<Any>>) {
-                val results = response.body() ?: return
-                val titles = results.getOrNull(1) as? List<*>
-                val officialTitle = titles?.getOrNull(0) as? String
-
-                if (officialTitle == null) {
-                    tvTitle.text = "History not found"
-                    tvExtract.text = "No records match [$query] yet."
-                    btnFull.visibility = View.GONE
-                    return
-                }
-
-                // Step 2: Fetch summary of the official title
-                fetchWikiSummary(officialTitle, tvTitle, tvExtract, ivThumb, btnFull)
-            }
-
-            override fun onFailure(call: retrofit2.Call<List<Any>>, t: Throwable) {
-                tvTitle.text = "Connection Error"
-                tvExtract.text = "Check your signal."
-                btnFull.visibility = View.GONE
-            }
-        })
-
-        btnClose.setOnClickListener { dialog.dismiss() }
-        dialog.show()
-    }
-
-    private fun fetchWikiSummary(title: String, tvTitle: TextView, tvExtract: TextView, ivThumb: ImageView, btnFull: View) {
-        // Wikipedia officially requires %20 or _ for spaces. URLEncoder.encode gives + which fails on some endpoints.
-        val encodedTitle = try { java.net.URLEncoder.encode(title, "UTF-8").replace("+", "%20") } catch (e: Exception) { title.replace(" ", "_") }
-        
-        WikipediaInstance.api.getPageSummary(encodedTitle).enqueue(object : retrofit2.Callback<WikipediaResponse> {
-            override fun onResponse(call: retrofit2.Call<WikipediaResponse>, response: retrofit2.Response<WikipediaResponse>) {
-                tvTitle.post { // Ensures UI updates happen on the master thread
-                    if (response.isSuccessful && response.body() != null) {
-                        val data = response.body()!!
-                        tvTitle.text = data.title ?: title
-                        tvExtract.text = data.extract ?: "Historical record is fully encrypted."
-                        
-                        if (!data.thumbnail?.source.isNullOrEmpty()) {
-                            ivThumb.visibility = android.view.View.VISIBLE
-                            com.bumptech.glide.Glide.with(this@NewsDetailActivity).load(data.thumbnail?.source).into(ivThumb)
-                        }
-
-                        btnFull.setOnClickListener {
-                            val wikiUrl = data.content_urls?.mobile?.page
-                            if (wikiUrl != null) {
-                                startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(wikiUrl)))
-                            }
-                        }
-                    } else {
-                        tvTitle.text = title
-                        tvExtract.text = "Summary not available. Access the full legacy article below."
-                        btnFull.setOnClickListener {
-                            val fallbackUrl = "https://en.m.wikipedia.org/wiki/${encodedTitle}"
-                            startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(fallbackUrl)))
-                        }
-                    }
-                }
-            }
-            override fun onFailure(call: retrofit2.Call<WikipediaResponse>, t: Throwable) {
-                tvTitle.post {
-                    tvTitle.text = title
-                    tvExtract.text = "Network signal too weak for summary. Try the full article!"
-                    btnFull.setOnClickListener {
-                        val fallbackUrl = "https://en.m.wikipedia.org/wiki/${encodedTitle}"
-                        startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(fallbackUrl)))
-                    }
-                }
-            }
-        })
-    }
 
     private fun trackArticleView(url: String) {
         val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser ?: return
@@ -662,6 +567,29 @@ class NewsDetailActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
             tts?.shutdown()
         }
         super.onDestroy()
+    }
+
+    private fun addToHistory(url: String?, title: String?, source: String?, imageUrl: String?) {
+        val user = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser ?: return
+        if (url == null || title == null) return
+
+        val article = NewsArticle(title, "", url, imageUrl, "Viewed recently", Source(source), "")
+        val prefs = getSharedPreferences("HistoryPrefs_${user.uid}", android.content.Context.MODE_PRIVATE)
+        val gson = com.google.gson.Gson()
+        val json = prefs.getString("saved_history", "[]")
+        val type = object : com.google.gson.reflect.TypeToken<MutableList<NewsArticle>>() {}.type
+        val historyList: MutableList<NewsArticle> = gson.fromJson(json, type) ?: mutableListOf()
+
+        // Remove if duplicate exists to bring it to top
+        historyList.removeAll { it.url == url }
+        historyList.add(0, article) // Add to top
+
+        // Limit to 50 items
+        if (historyList.size > 50) {
+            historyList.removeAt(historyList.size - 1)
+        }
+
+        prefs.edit().putString("saved_history", gson.toJson(historyList)).apply()
     }
 
     override fun onBackPressed() {

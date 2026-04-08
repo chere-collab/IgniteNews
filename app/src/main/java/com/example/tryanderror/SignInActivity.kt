@@ -10,7 +10,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import android.util.Patterns
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -39,13 +41,32 @@ class SignInActivity : AppCompatActivity() {
         val btnGoogle = findViewById<Button>(R.id.btnGoogleSignIn)
         val goToRegisterLink = findViewById<TextView>(R.id.goToRegister)
 
+        val tlEmail = findViewById<TextInputLayout>(R.id.tlEmail)
+        val tlPassword = findViewById<TextInputLayout>(R.id.tlPassword)
+
         signInButton.setOnClickListener {
             val email = emailField.text.toString().trim()
             val password = passwordField.text.toString().trim()
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+
+            // Reset errors
+            tlEmail.error = null
+            tlPassword.error = null
+
+            // 1. Basic Format Validation
+            if (email.isEmpty()) {
+                tlEmail.error = "Please enter your email"
                 return@setOnClickListener
             }
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                tlEmail.error = "Invalid email format"
+                return@setOnClickListener
+            }
+
+            if (password.isEmpty()) {
+                tlPassword.error = "Please enter your password"
+                return@setOnClickListener
+            }
+
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {

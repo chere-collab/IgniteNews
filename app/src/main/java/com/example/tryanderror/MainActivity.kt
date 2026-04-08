@@ -10,7 +10,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import android.util.Patterns
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
@@ -39,28 +41,64 @@ class MainActivity : AppCompatActivity() {
         val btnGoogle = findViewById<Button>(R.id.btnGoogleSignUp)
         val goToSignInLink = findViewById<TextView>(R.id.goToSignIn)
 
+        val tlFullName = findViewById<TextInputLayout>(R.id.tlFullName)
+        val tlEmail = findViewById<TextInputLayout>(R.id.tlEmail)
+        val tlPassword = findViewById<TextInputLayout>(R.id.tlPassword)
+
         registerButton.setOnClickListener {
             val email = emailField.text.toString().trim()
             val password = passwordField.text.toString().trim()
+            val fullNameField = findViewById<TextInputEditText>(R.id.fullName)
+            val fullName = fullNameField.text.toString().trim()
 
-            if (email.isEmpty() || password.isEmpty()) {
-                Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show()
+            // Reset errors
+            tlFullName.error = null
+            tlEmail.error = null
+            tlPassword.error = null
+
+            // 1. Validate Full Name
+            if (fullName.isEmpty()) {
+                tlFullName.error = "Please enter your name"
                 return@setOnClickListener
             }
-            if (password.length < 6) {
-                Toast.makeText(this, "Password must be at least 6 characters", Toast.LENGTH_SHORT).show()
+
+            // 2. Strong Email Validation
+            if (email.isEmpty()) {
+                tlEmail.error = "Email address is required"
+                return@setOnClickListener
+            }
+            if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                tlEmail.error = "Enter a valid email address"
+                return@setOnClickListener
+            }
+
+            // 3. Robust Password Validation
+            val passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$".toRegex()
+            
+            if (password.isEmpty()) {
+                tlPassword.error = "Password is required"
+                return@setOnClickListener
+            }
+            if (!password.matches(passwordPattern)) {
+                tlPassword.error = "Password must be 8+ chars with Upper, Lower, Number, and Special character"
                 return@setOnClickListener
             }
 
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Account created! Welcome to IgniteNews 🔥", Toast.LENGTH_LONG).show()
+                        // Save Name to Profile
+                        val profileUpdate = com.google.firebase.auth.userProfileChangeRequest {
+                            displayName = fullName
+                        }
+                        auth.currentUser?.updateProfile(profileUpdate)
+                        
+                        Toast.makeText(this, "Account created! Welcome 🔥", Toast.LENGTH_LONG).show()
                         goToNews()
                     } else {
                         val error = when (task.exception) {
                             is com.google.firebase.auth.FirebaseAuthUserCollisionException -> 
-                                "This email is already registered. Please sign in instead! 🛡️"
+                                "This email is already registered. Sign in! 🛡️"
                             is com.google.firebase.auth.FirebaseAuthWeakPasswordException -> 
                                 "Password too weak. Choose a stronger one! 🔐"
                             is com.google.firebase.auth.FirebaseAuthInvalidCredentialsException -> 

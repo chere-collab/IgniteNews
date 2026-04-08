@@ -109,19 +109,28 @@ class SettingsActivity : AppCompatActivity() {
         val user = auth.currentUser ?: return
         val dialogView = layoutInflater.inflate(R.layout.dialog_reauth, null)
         val passwordInput = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etReauthPassword)
+        val tlPassword = dialogView.findViewById<com.google.android.material.textfield.TextInputLayout>(R.id.tlReauthPassword)
 
-        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+        val dialog = com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setView(dialogView)
-            .setPositiveButton("PERMANENTLY DELETE") { _, _ ->
-                val password = passwordInput.text.toString()
-                if (password.isNotEmpty()) {
-                    reauthenticateAndDelete(password)
-                } else {
-                    Toast.makeText(this, "Password required to confirm deletion.", Toast.LENGTH_SHORT).show()
-                }
-            }
+            .setPositiveButton("PERMANENTLY DELETE", null) // Set null to handle click manually
             .setNegativeButton("CANCEL", null)
-            .show()
+            .create()
+
+        dialog.show()
+
+        // Handle positive button manually to keep dialog open on validation error
+        dialog.getButton(android.app.AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+            val password = passwordInput.text.toString()
+            tlPassword.error = null
+
+            if (password.isNotEmpty()) {
+                dialog.dismiss()
+                reauthenticateAndDelete(password)
+            } else {
+                tlPassword.error = "Password required to confirm deletion."
+            }
+        }
     }
 
     private fun reauthenticateAndDelete(password: String) {

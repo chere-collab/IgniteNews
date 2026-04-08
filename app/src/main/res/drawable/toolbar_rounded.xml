@@ -5,7 +5,4 @@
         android:startColor="@color/ignite_orange"
         android:endColor="#FF5722"
         android:angle="45" />
-    <corners
-        android:bottomLeftRadius="32dp"
-        android:bottomRightRadius="32dp" />
 </shape>

@@ -8,52 +8,36 @@
     android:background="@color/app_background">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/bookmarksToolbar"
+        android:id="@+id/historyToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@drawable/toolbar_rounded"
         android:elevation="6dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:title="My Bookmarks"
+        app:title="Reading History"
         app:navigationIcon="@drawable/ic_back_arrow"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/bookmarksRecyclerView"
+        android:id="@+id/historyRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingBottom="80dp"
+        android:paddingBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bookmarksToolbar"
+        app:layout_constraintTop_toBottomOf="@id/historyToolbar"
         tools:listitem="@layout/news_item" />
 
-    <!-- 🧭 Grounded Modern Navigation (Feature 21 - Profile Polish) -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNav"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:paddingBottom="12dp"
-        android:background="@drawable/bottom_nav_rounded"
-        android:elevation="12dp"
-        app:itemIconTint="@color/nav_item_color"
-        app:itemTextColor="@color/nav_item_color"
-        app:labelVisibilityMode="unlabeled"
-        app:itemIconSize="32dp"
-        app:itemHorizontalTranslationEnabled="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
-
     <TextView
-        android:id="@+id/emptyBookmarksText"
+        android:id="@+id/emptyHistoryText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No bookmarks yet!"
+        android:text="Your history is empty!"
         android:textSize="18sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bookmarksToolbar" />
+        app:layout_constraintTop_toBottomOf="@id/historyToolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
