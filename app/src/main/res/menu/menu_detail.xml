@@ -10,18 +10,15 @@
         android:id="@+id/action_listen"
         android:title="Listen"
         android:icon="@android:drawable/ic_lock_silent_mode_off"
-        app:iconTint="@android:color/white"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_share"
         android:title="Share"
         android:icon="@android:drawable/ic_menu_share"
-        app:iconTint="@android:color/white"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_download"
         android:title="Download as PDF"
         android:icon="@android:drawable/stat_sys_download"
-        app:iconTint="@android:color/white"
         app:showAsAction="ifRoom" />
 </menu>

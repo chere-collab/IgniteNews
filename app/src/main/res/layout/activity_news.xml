@@ -221,7 +221,7 @@
             app:itemIconTint="@color/nav_item_color"
             app:itemTextColor="@color/nav_item_color"
             app:labelVisibilityMode="unlabeled"
-            app:itemIconSize="32dp"
+            app:itemIconSize="38dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:menu="@menu/bottom_nav_menu" />
 

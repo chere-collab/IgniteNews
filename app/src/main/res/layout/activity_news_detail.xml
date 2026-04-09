@@ -50,7 +50,7 @@
                 app:navigationIconTint="@android:color/white"
                 app:titleTextColor="@android:color/white"
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                app:popupTheme="@style/ThemeOverlay.AppCompat.DayNight" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -120,6 +120,55 @@
                     app:chipStrokeColor="@color/ignite_orange"
                     app:chipStrokeWidth="1dp" />
             </LinearLayout>
+            
+            <TextView
+                android:id="@+id/tvDetailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/text_primary"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:lineSpacingExtra="4dp" />
+
+            <TextView
+                android:id="@+id/tvDetailDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="8dp"
+                android:textColor="#888888"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvDetailDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="20dp"
+                android:textColor="#444444"
+                android:textSize="18sp"
+                android:lineSpacingExtra="6dp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="24dp"
+                android:background="#1A000000" />
+            
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="16dp"
+                android:text="Official Full Article"
+                android:textColor="@color/ignite_orange"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textAllCaps="true"
+                android:letterSpacing="0.1" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -129,7 +178,7 @@
                 <WebView
                     android:id="@+id/newsWebView"
                     android:layout_width="match_parent"
-                    android:layout_height="600dp" />
+                    android:layout_height="wrap_content" />
 
                 <!-- 🔍 Live Zoom Indicator -->
                 <TextView
